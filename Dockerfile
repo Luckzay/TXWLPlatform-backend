@@ -11,7 +11,7 @@ COPY src ./src
 RUN mvn clean package -DskipTests
 
 # 运行阶段
-FROM openjdk:17-jdk-slim
+FROM openjdk:17-jre-slim
 
 WORKDIR /app
 
