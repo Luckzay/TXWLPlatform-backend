@@ -1,5 +1,5 @@
 # 多阶段构建 - 编译阶段
-FROM eclipse-temurin:17-jdk-slim AS builder
+FROM openjdk:17-jdk-slim AS builder
 
 WORKDIR /workspace
 
@@ -11,7 +11,7 @@ COPY src ./src
 RUN ./mvnw clean package -DskipTests
 
 # 运行阶段
-FROM eclipse-temurin:17-jre-alpine
+FROM openjdk:17-jre-slim
 
 WORKDIR /app
 
