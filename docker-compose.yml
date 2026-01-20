@@ -18,12 +18,18 @@ services:
     networks:
       - txwl_network
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   app:
     build: .
     container_name: txwl_backend
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     environment:
       - SPRING_PROFILES_ACTIVE=docker
       - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/txwl_platform?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
