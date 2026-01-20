@@ -1,5 +1,5 @@
 # 多阶段构建 - 编译阶段
-FROM maven:3.8.6-openjdk-17 AS builder
+FROM maven:3.8.6-eclipse-temurin-17 AS builder
 
 WORKDIR /workspace
 
