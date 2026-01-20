@@ -1,5 +1,5 @@
 # 多阶段构建 - 编译阶段
-FROM maven:3.8.6-openjdk-17-slim AS builder
+FROM maven:3.8.6-openjdk-17 AS builder
 
 WORKDIR /workspace
 
@@ -8,8 +8,8 @@ COPY src ./src
 
 RUN mvn clean package -DskipTests
 
-# 运行阶段 - 使用带具体版本号的镜像
-FROM openjdk:17.0.2-slim
+# 运行阶段 - 使用Debian为基础的OpenJDK
+FROM openjdk:17-jdk-buster
 
 WORKDIR /app
 
