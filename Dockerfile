@@ -1,5 +1,5 @@
 # 多阶段构建 - 编译阶段
-FROM registry.cn-hangzhou.aliyuncs.com/acs/openjdk:17-jdk-slim AS builder
+FROM maven:3.8.6-openjdk-17 AS builder
 
 WORKDIR /workspace
 
@@ -8,10 +8,10 @@ COPY pom.xml .
 COPY src ./src
 
 # 下载依赖并编译构建
-RUN ./mvnw clean package -DskipTests
+RUN mvn clean package -DskipTests
 
 # 运行阶段
-FROM registry.cn-hangzhou.aliyuncs.com/acs/openjdk:17-jre-slim
+FROM openjdk:17-jdk-slim
 
 WORKDIR /app
 
