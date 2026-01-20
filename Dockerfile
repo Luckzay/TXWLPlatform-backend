@@ -10,8 +10,8 @@ COPY src ./src
 # 下载依赖并编译构建
 RUN mvn clean package -DskipTests
 
-# 运行阶段
-FROM openjdk:17-jre-slim
+# 运行阶段 - 使用 eclipse-temurin JDK
+FROM eclipse-temurin:17-jre-focal
 
 WORKDIR /app
 
