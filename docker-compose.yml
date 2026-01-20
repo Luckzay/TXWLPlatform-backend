@@ -1,23 +1,23 @@
 version: '3.8'
 
 services:
-  backend:
-    build: .  # 从当前目录构建镜像
-    # 或者使用预构建的镜像: image: registry.cn-hangzhou.aliyuncs.com/<你的命名空间>/txwl-platform-backend:latest
-    container_name: txwl-platform-backend
+  txwl-platform:
+    build: .
+    container_name: txwl-platform
     ports:
       - "8080:8080"
     environment:
-      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_PROFILES_ACTIVE=docker
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/txwl_platform
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=admin
-      - AI_API_KEY=${AI_API_KEY:-sk-68ba763917d04a5e96c263b37f2c2258}
-      - AI_API_ENDPOINT=${AI_API_ENDPOINT:-https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions}
-      - AI_API_MODEL=${AI_API_MODEL:-qwen-flash}
+      - AI_API_KEY=sk-68ba763917d04a5e96c263b37f2c2258
+      - AI_API_ENDPOINT=https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions
+      - AI_API_MODEL=qwen-flash
     depends_on:
       - mysql
-    restart: unless-stopped
+    networks:
+      - txwl-network
 
   mysql:
     image: mysql:8.0
@@ -29,9 +29,13 @@ services:
       MYSQL_DATABASE: txwl_platform
     volumes:
       - mysql_data:/var/lib/mysql
-      - ./src/main/resources/txwl_platform.SQL:/docker-entrypoint-initdb.d/1_txwl_platform.sql
-      - ./src/main/resources/data_external/insert_questions.sql:/docker-entrypoint-initdb.d/2_insert_questions.sql
-    restart: unless-stopped
+      - ./src/main/resources/txwl_platform.SQL:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - txwl-network
+
+networks:
+  txwl-network:
+    driver: bridge
 
 volumes:
   mysql_data:
