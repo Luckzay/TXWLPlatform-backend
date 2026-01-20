@@ -1,5 +1,5 @@
 # 多阶段构建 - 编译阶段
-FROM registry.cn-hangzhou.aliyuncs.com/library/maven:3.8.6-eclipse-temurin-17 AS builder
+FROM maven:3.8.6-jdk-17 AS builder
 
 WORKDIR /workspace
 
@@ -7,11 +7,26 @@ WORKDIR /workspace
 COPY pom.xml .
 COPY src ./src
 
+# 设置Maven镜像源加速（国内）
+RUN echo '<?xml version="1.0" encoding="UTF-8"?>' > /usr/share/maven/conf/settings.xml && \
+    echo '<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"' >> /usr/share/maven/conf/settings.xml && \
+    echo '          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"' >> /usr/share/maven/conf/settings.xml && \
+    echo '          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">' >> /usr/share/maven/conf/settings.xml && \
+    echo '  <mirrors>' >> /usr/share/maven/conf/settings.xml && \
+    echo '    <mirror>' >> /usr/share/maven/conf/settings.xml && \
+    echo '      <id>alimaven</id>' >> /usr/share/maven/conf/settings.xml && \
+    echo '      <name>aliyun maven</name>' >> /usr/share/maven/conf/settings.xml && \
+    echo '      <url>https://maven.aliyun.com/repository/public</url>' >> /usr/share/maven/conf/settings.xml && \
+    echo '      <mirrorOf>central</mirrorOf>' >> /usr/share/maven/conf/settings.xml && \
+    echo '    </mirror>' >> /usr/share/maven/conf/settings.xml && \
+    echo '  </mirrors>' >> /usr/share/maven/conf/settings.xml && \
+    echo '</settings>' >> /usr/share/maven/conf/settings.xml
+
 # 下载依赖并编译构建
 RUN mvn clean package -DskipTests
 
-# 运行阶段 - 使用阿里云镜像源
-FROM registry.cn-hangzhou.aliyuncs.com/library/openjdk:17-jdk-slim
+# 运行阶段 - 使用官方镜像
+FROM openjdk:17-jdk-slim
 
 WORKDIR /app
 
