@@ -1,5 +1,5 @@
 # 多阶段构建 - 编译阶段
-FROM maven:3.8.6-eclipse-temurin-17 AS builder
+FROM registry.cn-hangzhou.aliyuncs.com/library/maven:3.8.6-eclipse-temurin-17 AS builder
 
 WORKDIR /workspace
 
@@ -10,8 +10,8 @@ COPY src ./src
 # 下载依赖并编译构建
 RUN mvn clean package -DskipTests
 
-# 运行阶段 - 使用 eclipse-temurin JDK
-FROM eclipse-temurin:17-jre-focal
+# 运行阶段 - 使用阿里云镜像源
+FROM registry.cn-hangzhou.aliyuncs.com/library/openjdk:17-jdk-slim
 
 WORKDIR /app
 
