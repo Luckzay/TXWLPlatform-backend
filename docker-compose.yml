@@ -2,7 +2,8 @@ version: '3.8'
 
 services:
   backend:
-    image: registry.cn-hangzhou.aliyuncs.com/<你的命名空间>/txwl-platform-backend:latest
+    build: .  # 从当前目录构建镜像
+    # 或者使用预构建的镜像: image: registry.cn-hangzhou.aliyuncs.com/<你的命名空间>/txwl-platform-backend:latest
     container_name: txwl-platform-backend
     ports:
       - "8080:8080"
