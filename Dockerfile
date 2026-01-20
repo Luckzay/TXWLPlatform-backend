@@ -11,7 +11,7 @@ COPY src ./src
 RUN ./mvnw clean package -DskipTests
 
 # 运行阶段
-FROM openjdk:17-jre-slim
+FROM openjdk:17
 
 WORKDIR /app
 
