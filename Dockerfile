@@ -11,7 +11,7 @@ COPY src ./src
 RUN ./mvnw clean package -DskipTests
 
 # 如果在构建时已经准备好jar文件，则直接使用此版本
-FROM eclipse-temurin:17-jre-slim
+FROM eclipse-temurin:17-jre-alpine
 
 WORKDIR /app
 
