@@ -10,13 +10,13 @@ COPY .mvn .mvn
 COPY pom.xml .
 
 # 下载依赖（利用Docker缓存层）
-RUN ./mvnw dependency:go-offline -B
+RUN mvn dependency:go-offline -B
 
 # 复制源代码
 COPY src ./src
 
 # 构建应用包
-RUN ./mvnw clean package -DskipTests
+RUN mvn clean package -DskipTests
 
 # 第二阶段：运行应用
 FROM eclipse-temurin:17-jre-alpine
