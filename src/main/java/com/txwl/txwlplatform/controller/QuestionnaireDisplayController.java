@@ -6,6 +6,7 @@ import com.txwl.txwlplatform.model.entity.Answer;
 import com.txwl.txwlplatform.service.IQuestionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -23,6 +24,7 @@ public class QuestionnaireDisplayController {
      * 获取问卷题目用于作答界面展示
      */
     @GetMapping("/paper/{paperId}/questions")
+    @PreAuthorize("@paperPermissionEvaluator.hasPaperAccess(authentication, #paperId)")
     public ResponseEntity<Map<String, Object>> getQuestionsForAnswering(@PathVariable Long paperId) {
         // 获取该试卷的所有题目及选项
         List<Map<String, Object>> questionsWithAnswers = questionService.getQuestionsWithAnswersByPaperId(paperId);
@@ -39,26 +41,21 @@ public class QuestionnaireDisplayController {
      * 分页获取问卷题目用于作答界面展示
      */
     @GetMapping("/paper/{paperId}/questions/page")
+    @PreAuthorize("@paperPermissionEvaluator.hasPaperAccess(authentication, #paperId)")
     public ResponseEntity<Map<String, Object>> getQuestionsForAnsweringPaginated(
             @PathVariable Long paperId,
             @RequestParam(defaultValue = "1") int pageNum,
             @RequestParam(defaultValue = "10") int pageSize) {
         
-        // 获取该试卷的所有题目及选项
-        List<Map<String, Object>> allQuestionsWithAnswers = questionService.getQuestionsWithAnswersByPaperId(paperId);
-        
-        // 手动分页处理
-        int startIndex = (pageNum - 1) * pageSize;
-        int endIndex = Math.min(startIndex + pageSize, allQuestionsWithAnswers.size());
-        
-        List<Map<String, Object>> paginatedQuestions = allQuestionsWithAnswers.subList(startIndex, endIndex);
+        // 使用数据库分页查询题目及答案
+        Page<Map<String, Object>> questionsPage = questionService.getQuestionsWithAnswersByPaperIdPaginated(paperId, pageNum, pageSize);
         
         Map<String, Object> response = new HashMap<>();
         response.put("paperId", paperId);
-        response.put("totalQuestions", allQuestionsWithAnswers.size());
-        response.put("currentPage", pageNum);
-        response.put("totalPages", (int) Math.ceil((double) allQuestionsWithAnswers.size() / pageSize));
-        response.put("questions", paginatedQuestions);
+        response.put("totalQuestions", (int) questionsPage.getTotal());
+        response.put("currentPage", (int) questionsPage.getCurrent());
+        response.put("totalPages", (int) questionsPage.getPages());
+        response.put("questions", questionsPage.getRecords());
         
         return ResponseEntity.ok(response);
     }

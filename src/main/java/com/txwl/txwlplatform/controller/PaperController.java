@@ -2,9 +2,12 @@ package com.txwl.txwlplatform.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.txwl.txwlplatform.model.entity.Paper;
+import com.txwl.txwlplatform.security.WebAuthenticationDetailsWithUserRoleId;
 import com.txwl.txwlplatform.service.IPaperService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,9 +27,19 @@ public class PaperController {
     @GetMapping("/page")
     public ResponseEntity<Page<Paper>> getPapersPage(
             @RequestParam(defaultValue = "1") int pageNum,
-            @RequestParam(defaultValue = "10") int pageSize) {
+            @RequestParam(defaultValue = "10") int pageSize,
+            Authentication authentication) {
         
-        Page<Paper> papersPage = paperService.getPapersPage(pageNum, pageSize);
+        // 从认证信息中获取用户角色ID
+        Long userRoleId = null;
+        if (authentication != null) {
+            var details = authentication.getDetails();
+            if (details instanceof WebAuthenticationDetailsWithUserRoleId) {
+                userRoleId = ((WebAuthenticationDetailsWithUserRoleId) details).getUserRoleId();
+            }
+        }
+        
+        Page<Paper> papersPage = paperService.getPapersPageWithAccess(pageNum, pageSize, userRoleId);
         return ResponseEntity.ok(papersPage);
     }
 

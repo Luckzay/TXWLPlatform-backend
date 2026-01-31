@@ -1,8 +1,10 @@
 package com.txwl.txwlplatform.security;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.txwl.txwlplatform.model.entity.User;
+import com.txwl.txwlplatform.mapper.RoleMapper;
 import com.txwl.txwlplatform.mapper.UserMapper;
+import com.txwl.txwlplatform.model.entity.Role;
+import com.txwl.txwlplatform.model.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -19,6 +21,9 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private RoleMapper roleMapper;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -40,9 +45,11 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         // 获取用户角色
         List<GrantedAuthority> authorities = new ArrayList<>();
-        // 这里可以根据用户的角色信息添加权限
-        authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+        String roleName = "ROLE_" + roleMapper.selectById(user.getRoleId()).getRoleName();
+        // 添加用户的角色信息
+        authorities.add(new SimpleGrantedAuthority(roleName));
 
+        // 返回包含用户角色ID的UserDetails
         return new org.springframework.security.core.userdetails.User(
                 user.getUsername(),
                 user.getPassword(),

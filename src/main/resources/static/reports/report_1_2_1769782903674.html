@@ -1,0 +1,72 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>生涯测评报告</title><style>@page { size: A4; margin: 20mm; }
+body { font-family: \"Source Han Sans CN\", \"思源黑体\", \"PingFang SC\", \"Microsoft YaHei\", sans-serif; font-size: 12pt; line-height: 1.5; color: #222; margin: 20px; padding: 20px; }
+.page { page-break-after: always; position: relative; min-height: 297mm; margin: 20px auto; max-width: 210mm; padding: 20mm; box-sizing: border-box; }
+.no-break { page-break-inside: avoid; }
+h1 { font-size: 28pt; text-align: center; margin: 0 0 20mm 0; color: #0052D9; }
+h2 { font-size: 18pt; text-align: left; margin: 20mm 0 10mm 0; color: #0052D9; }
+h3 { font-size: 14pt; font-weight: bold; margin: 15mm 0 8mm 0; color: #222; }
+.header-line { position: fixed; top: 8mm; left: 0; right: 0; height: 1px; background-color: #E4E7ED; }
+.footer { position: fixed; bottom: 8mm; left: 0; right: 0; text-align: center; font-size: 9pt; color: #666; }
+.page-number { text-align: center; }
+.cover-info { margin: 30mm 0; text-align: center; }
+.cover-info p { margin: 5mm 0; }
+.toc-item { display: flex; justify-content: space-between; margin: 5mm 0; }
+.rating-bar-container { width: 100%; max-width: 300px; height: 6px; background-color: #E4E7ED; margin: 5px 0; }
+.rating-bar-fill { height: 100%; background-color: #0052D9; }
+.trait-card { display: flex; align-items: center; margin: 10px 0; padding: 10px; border: 1px solid #E4E7ED; border-radius: 5px; }
+.trait-name { width: 120px; font-weight: bold; }
+.trait-details { flex-grow: 1; }
+.trait-analysis { margin-top: 5px; font-size: 10pt; color: #555; }
+.subject-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 10px; }
+.subject-card { padding: 10px; border: 1px solid #E4E7ED; border-radius: 5px; }
+.dot { font-size: 12pt; margin-right: 8px; }
+.summary { font-size: 20pt; font-weight: bold; text-align: center; margin: 40mm 0; color: #0052D9; }
+.indent { text-indent: 2em; }
+.chart-container { width: 300px; height: 300px; margin: 20px auto; }
+</style><script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script></head><body><div class='page'><div class='header-line'></div><h1>生涯测评报告</h1><div class='cover-info'><p>用户：13934334262</p><p>评测人：同行未来生涯规划分析师</p><p>2026年01月30日</p></div></div><div class='page'><div class='header-line'></div><h2>目录</h2><div class='toc-item'><span>1. 职业特质</span><span>3</span></div><div class='toc-item'><span>2. 专业推荐</span><span>4</span></div><div class='toc-item'><span>3. 生涯规划</span><span>5</span></div></div><div class='page'><div class='header-line'></div><h2>职业特质</h2><h3>霍兰德六型</h3><div class='chart-container'><canvas id='holland-chart'></canvas></div><div class='no-break'><div class='trait-card'><div class='trait-name'>实用型 (30分)</div><div class='trait-details'><div class='rating-bar-container'><div class='rating-bar-fill' style='width: 30%;'></div></div><div class='trait-analysis'><p><strong>特点：</strong>偏好具体操作与动手实践，但实际能力较弱。</p><p><strong>兴趣：</strong>对机械、工具类活动兴趣一般，缺乏主动参与。</p><p><strong>适合环境：</strong>适合技术性岗位，但需加强动手训练。</p><p><strong>适合职业：</strong>机械维修、工程助理等基础技术类工作。</p></div></div></div><div class='trait-card'><div class='trait-name'>研究型 (55分)</div><div class='trait-details'><div class='rating-bar-container'><div class='rating-bar-fill' style='width: 55%;'></div></div><div class='trait-analysis'><p><strong>特点：</strong>思维复杂，善于思考抽象问题，喜欢探索未知。</p><p><strong>兴趣：</strong>对科学原理、自然现象和逻辑推理有浓厚兴趣。</p><p><strong>适合环境：</strong>科研实验室、数据分析或学术研究环境。</p><p><strong>适合职业：</strong>科学家、研究员、数据分析师等专业岗位。</p></div></div></div><div class='trait-card'><div class='trait-name'>艺术型 (60分)</div><div class='trait-details'><div class='rating-bar-container'><div class='rating-bar-fill' style='width: 60%;'></div></div><div class='trait-analysis'><p><strong>特点：</strong>富有想象力与创造力，情感表达丰富。</p><p><strong>兴趣：</strong>热爱音乐、舞蹈、艺术创作及美学体验。</p><p><strong>适合环境：</strong>创意工作室、文化演出或艺术展览空间。</p><p><strong>适合职业：</strong>音乐家、舞者、导演、艺术家等创造性职业。</p></div></div></div><div class='trait-card'><div class='trait-name'>社会型 (25分)</div><div class='trait-details'><div class='rating-bar-container'><div class='rating-bar-fill' style='width: 25%;'></div></div><div class='trait-analysis'><p><strong>特点：</strong>人际交往能力较弱，不擅长建立亲密关系。</p><p><strong>兴趣：</strong>对教育、辅导类活动兴趣不高，偏向独立工作。</p><p><strong>适合环境：</strong>独立性强的非人际密集型工作环境。</p><p><strong>适合职业：</strong>心理咨询师、教师等角色需进一步提升社交技能。</p></div></div></div><div class='trait-card'><div class='trait-name'>企业型 (45分)</div><div class='trait-details'><div class='rating-bar-container'><div class='rating-bar-fill' style='width: 45%;'></div></div><div class='trait-analysis'><p><strong>特点：</strong>具备领导意愿，但执行力与责任感尚待加强。</p><p><strong>兴趣：</strong>对组织管理、商业运营有一定兴趣，但缺乏行动力。</p><p><strong>适合环境：</strong>企业中层管理或创业团队初期阶段。</p><p><strong>适合职业：</strong>企业家、项目经理、市场营销等职位。</p></div></div></div><div class='trait-card'><div class='trait-name'>常规型 (35分)</div><div class='trait-details'><div class='rating-bar-container'><div class='rating-bar-fill' style='width: 35%;'></div></div><div class='trait-analysis'><p><strong>特点：</strong>做事条理清晰，但缺乏灵活性与创新意识。</p><p><strong>兴趣：</strong>偏好规则明确、流程规范的工作任务。</p><p><strong>适合环境：</strong>行政事务、财务会计等结构化岗位。</p><p><strong>适合职业：</strong>会计、文秘、行政主管等常规职业。</p></div></div></div></div><h3>五力</h3><div class='chart-container'><canvas id='five-powers-chart'></canvas></div><div class='no-break'><div class='trait-card'><div class='trait-name'>亲和力 (40分)</div><div class='trait-details'><div class='rating-bar-container'><div class='rating-bar-fill' style='width: 40%;'></div></div><div class='trait-analysis'><p><strong>心理特质：</strong>情感内敛，倾向于自我保护，不易亲近他人。</p><p><strong>行为特质：</strong>在群体中保持距离，避免主动互动，偏好独处。</p></div></div></div><div class='trait-card'><div class='trait-name'>推动力 (70分)</div><div class='trait-details'><div class='rating-bar-container'><div class='rating-bar-fill' style='width: 70%;'></div></div><div class='trait-analysis'><p><strong>心理特质：</strong>内在驱动力强，追求意义与成就，目标感明确。</p><p><strong>行为特质：</strong>主动承担责任，愿意面对挑战，坚持到底。</p></div></div></div><div class='trait-card'><div class='trait-name'>执行力 (30分)</div><div class='trait-details'><div class='rating-bar-container'><div class='rating-bar-fill' style='width: 30%;'></div></div><div class='trait-analysis'><p><strong>心理特质：</strong>计划执行能力较弱，易拖延且缺乏持续性。</p><p><strong>行为特质：</strong>常制定计划但难以落实，依赖外部推动。</p></div></div></div><div class='trait-card'><div class='trait-name'>抗压力 (45分)</div><div class='trait-details'><div class='rating-bar-container'><div class='rating-bar-fill' style='width: 45%;'></div></div><div class='trait-analysis'><p><strong>心理特质：</strong>面对压力易情绪波动，但仍有基本应对能力。</p><p><strong>行为特质：</strong>遇挫时可能退缩，但能短暂恢复并继续尝试。</p></div></div></div><div class='trait-card'><div class='trait-name'>规划力 (35分)</div><div class='trait-details'><div class='rating-bar-container'><div class='rating-bar-fill' style='width: 35%;'></div></div><div class='trait-analysis'><p><strong>心理特质：</strong>缺乏系统规划意识，偏好即兴发挥。</p><p><strong>行为特质：</strong>做事前准备不足，容易临时调整方向。</p></div></div></div></div><h3>八型人格</h3><div class='chart-container'><canvas id='eight-personality-chart'></canvas></div><div class='no-break'><div class='trait-card'><div class='trait-name'>完美型_海豚 (20分)</div><div class='trait-details'><div class='rating-bar-container'><div class='rating-bar-fill' style='width: 20%;'></div></div><div class='trait-analysis'>追求完美但缺乏耐心，理想主义倾向明显。</div></div></div><div class='trait-card'><div class='trait-name'>活跃型_鹦鹉 (30分)</div><div class='trait-details'><div class='rating-bar-container'><div class='rating-bar-fill' style='width: 30%;'></div></div><div class='trait-analysis'>性格活跃但不够稳定，情绪起伏较大。</div></div></div><div class='trait-card'><div class='trait-name'>勇敢型_老虎 (25分)</div><div class='trait-details'><div class='rating-bar-container'><div class='rating-bar-fill' style='width: 25%;'></div></div><div class='trait-analysis'>勇敢果断但缺乏自信，面对困难易动摇。</div></div></div><div class='trait-card'><div class='trait-name'>成就型_狮子 (60分)</div><div class='trait-details'><div class='rating-bar-container'><div class='rating-bar-fill' style='width: 60%;'></div></div><div class='trait-analysis'>目标导向强烈，渴望成功，具有领导潜力。</div></div></div><div class='trait-card'><div class='trait-name'>感觉型_孔雀 (55分)</div><div class='trait-details'><div class='rating-bar-container'><div class='rating-bar-fill' style='width: 55%;'></div></div><div class='trait-analysis'>情感丰富，注重美感与表达，富有艺术气质。</div></div></div><div class='trait-card'><div class='trait-name'>思考型_猫头鹰 (65分)</div><div class='trait-details'><div class='rating-bar-container'><div class='rating-bar-fill' style='width: 65%;'></div></div><div class='trait-analysis'>理性冷静，擅长分析与逻辑推理，思维缜密。</div></div></div><div class='trait-card'><div class='trait-name'>和平型_和平鸽 (20分)</div><div class='trait-details'><div class='rating-bar-container'><div class='rating-bar-fill' style='width: 20%;'></div></div><div class='trait-analysis'>内心敏感，回避冲突，倾向于和谐相处。</div></div></div><div class='trait-card'><div class='trait-name'>友好型_熊猫 (25分)</div><div class='trait-details'><div class='rating-bar-container'><div class='rating-bar-fill' style='width: 25%;'></div></div><div class='trait-analysis'>友善但被动，不善于主动建立联系。</div></div></div></div></div><div class='page'><div class='header-line'></div><h2>专业推荐</h2><div class='chart-container'><canvas id='twelve-subjects-chart'></canvas></div><div class='subject-grid'><div class='subject-card'><h4>工学 (40分)</h4><div class='rating-bar-container'><div class='rating-bar-fill' style='width: 40%;'></div></div><p>虽具技术兴趣，但动手能力不足，需加强实践训练。</p></div><div class='subject-card'><h4>文学 (55分)</h4><div class='rating-bar-container'><div class='rating-bar-fill' style='width: 55%;'></div></div><p>对语言表达与文学作品有较高兴趣，适合人文领域。</p></div><div class='subject-card'><h4>理学 (70分)</h4><div class='rating-bar-container'><div class='rating-bar-fill' style='width: 70%;'></div></div><p>思维逻辑强，对自然科学现象高度关注，适合科研方向。</p></div><div class='subject-card'><h4>管理学 (50分)</h4><div class='rating-bar-container'><div class='rating-bar-fill' style='width: 50%;'></div></div><p>具备领导意愿，但组织协调能力待提升，可发展管理潜能。</p></div><div class='subject-card'><h4>医学 (35分)</h4><div class='rating-bar-container'><div class='rating-bar-fill' style='width: 35%;'></div></div><p>缺乏医疗相关兴趣与耐性，不适合临床医学方向。</p></div><div class='subject-card'><h4>艺术学 (75分)</h4><div class='rating-bar-container'><div class='rating-bar-fill' style='width: 75%;'></div></div><p>艺术感知力强，尤其在音乐与舞蹈方面表现突出，极具发展潜力。</p></div><div class='subject-card'><h4>法学 (30分)</h4><div class='rating-bar-container'><div class='rating-bar-fill' style='width: 30%;'></div></div><p>逻辑能力尚可，但缺乏争辩与对抗性行为倾向，不适合法律职业。</p></div><div class='subject-card'><h4>农学 (25分)</h4><div class='rating-bar-container'><div class='rating-bar-fill' style='width: 25%;'></div></div><p>对动植物知识兴趣较低，不适合农业类学科。</p></div><div class='subject-card'><h4>教育学 (35分)</h4><div class='rating-bar-container'><div class='rating-bar-fill' style='width: 35%;'></div></div><p>虽具责任感，但社交能力不足，教学岗位需额外培养。</p></div><div class='subject-card'><h4>经济学 (45分)</h4><div class='rating-bar-container'><div class='rating-bar-fill' style='width: 45%;'></div></div><p>对经济活动有一定兴趣，但理财能力弱，需补足财务知识。</p></div><div class='subject-card'><h4>历史学 (50分)</h4><div class='rating-bar-container'><div class='rating-bar-fill' style='width: 50%;'></div></div><p>对历史事件与人物有探究欲望，适合历史文化类学习。</p></div><div class='subject-card'><h4>哲学 (60分)</h4><div class='rating-bar-container'><div class='rating-bar-fill' style='width: 60%;'></div></div><p>善于沉思，喜欢探讨抽象概念，哲学思维契合度高。</p></div></div><h3>适合学科</h3><p class='indent'>艺术、科学、文学、哲学、管理</p></div><div class='page'><div class='header-line'></div><h2>生涯规划</h2><p><span class='dot'>•</span><strong>兴趣特点：</strong>偏好创造性与智力挑战性活动，尤其喜爱音乐、舞蹈与科学探索，对抽象思维与艺术表达有天然兴趣。</p><p><span class='dot'>•</span><strong>能力性格：</strong>具备较强逻辑分析与艺术感知能力，但执行力与情绪调节能力较弱，需通过系统训练提升综合素养。</p><p><span class='dot'>•</span><strong>人格思维：</strong>理性与感性兼具，思维复杂且富有想象力，倾向独立思考，追求个人价值实现与精神满足。</p><p><span class='dot'>•</span><strong>天赋学科：</strong>语文、外语、物理、化学、生物</p></div><div class='page'><div class='header-line'></div><h2>总体评价</h2><div class='summary'>个体具备较强的思维深度与艺术感知力，同时拥有较高的成就动机与领导意愿。然而，在执行力、情绪稳定性与人际互动方面存在明显短板。整体倾向为理性与感性并重，适合从事需要创造力与逻辑结合的职业路径。</div></div><div class='page'><div class='header-line'></div><div class='summary'>— 报告结束 —</div></div><script>const hollandData = [30,55,60,25,45,35];
+const fivePowersData = [40,70,30,45,35];
+const eightPersonalityData = [20,30,25,60,55,65,20,25];
+const twelveSubjectsData = [40,55,70,50,35,75,30,25,35,45,50,60];
+
+document.addEventListener('DOMContentLoaded', function() {
+  drawRadarChart('holland-chart', hollandData, ['实用型','研究型','艺术型','社会型','企业型','常规型']);
+  drawRadarChart('five-powers-chart', fivePowersData, ['亲和力','推动力','执行力','抗压力','规划力']);
+  drawRadarChart('eight-personality-chart', eightPersonalityData, ['海豚','鹦鹉','老虎','狮子','孔雀','猫头鹰','和平鸽','熊猫']);
+  drawRadarChart('twelve-subjects-chart', twelveSubjectsData, ['工学','文学','理学','管理学','医学','艺术学','法学','农学','教育学','经济学','历史学','哲学']);
+});
+function drawRadarChart(canvasId, data, labels) {
+  const ctx = document.getElementById(canvasId).getContext('2d');
+  new Chart(ctx, {
+    type: 'radar',
+    data: {
+      labels: labels,
+      datasets: [{
+        data: data,
+        backgroundColor: 'rgba(0, 82, 217, 0.2)',
+        borderColor: '#0052D9',
+        borderWidth: 1,
+        pointBackgroundColor: '#0052D9',
+        pointBorderColor: '#fff',
+        pointHoverBackgroundColor: '#fff',
+        pointHoverBorderColor: '#0052D9'
+      }]
+    },
+    options: {
+      scales: {
+        r: {
+          beginAtZero: true,
+          max: 100,
+          ticks: { stepSize: 20, display: true },
+          grid: { color: 'rgba(0, 0, 0, 0.1)' },
+          angleLines: { color: 'rgba(0, 0, 0, 0.1)' },
+          pointLabels: { font: { size: 12 } }
+        }
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: { enabled: true }
+      }
+    }
+  });
+}
+</script><div class='footer'><div class='page-number'>第 <span class='pageNumber'></span> 页 / 共 <span class='totalPages'></span> 页</div></div></body></html>

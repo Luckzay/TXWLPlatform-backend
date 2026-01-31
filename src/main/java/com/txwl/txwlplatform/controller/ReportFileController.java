@@ -82,16 +82,15 @@ public class ReportFileController {
             if (!file.exists()) {
                 return ResponseEntity.notFound().build();
             }
-            
             // 验证用户是否有权访问此报告
             if (!hasAccessToReport(fileName)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             }
-            
+            System.out.println("File Path: " + filePath);
             InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
             
             MediaType contentType = determineMediaType(fileName);
-            
+            System.out.println("Content Type: " + contentType);
             return ResponseEntity.ok()
                     .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + fileName + "\"")
                     .contentType(contentType)
@@ -153,7 +152,7 @@ public class ReportFileController {
                     return false;
                 }
                 // 用户ID是第三部分（索引为2），因为格式是 report_{userId}_{paperId}_{timestamp}
-                Long reportUserId = Long.parseLong(parts[2]); // 用户ID是第三部分
+                Long reportUserId = Long.parseLong(parts[1]); // 用户ID是第三部分
                 // 检查当前用户ID是否与报告中的用户ID匹配
                 return currentUserId.equals(reportUserId);
             } else {

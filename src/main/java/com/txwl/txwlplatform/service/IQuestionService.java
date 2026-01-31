@@ -3,38 +3,61 @@ package com.txwl.txwlplatform.service;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.txwl.txwlplatform.model.entity.Question;
 import com.txwl.txwlplatform.model.entity.Answer;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 public interface IQuestionService {
-    /**
-     * 分页获取题目
-     */
     Page<Question> getQuestionsPage(int pageNum, int pageSize);
-
-    /**
-     * 根据试卷ID获取题目列表
-     */
     List<Question> getQuestionsByPaperId(Long paperId);
-
-    /**
-     * 根据题目ID列表获取题目列表
-     */
     List<Question> getQuestionsByIds(Set<Long> questionIds);
-
-    /**
-     * 获取题目的选项
-     */
     List<Answer> getAnswersByQuestionId(Long questionId);
+    Question getQuestionWithAnswers(Long questionId);
+    List<Map<String, Object>> getQuestionsWithAnswersByPaperId(Long paperId);
     
     /**
-     * 根据题目ID获取完整信息（含选项）
+     * 分页查询指定试卷的题目
      */
-    Question getQuestionWithAnswers(Long questionId);
-
+    Page<Question> getQuestionsByPaperIdPaginated(Long paperId, int pageNum, int pageSize);
+    
     /**
-     * 获取试卷的完整题目和选项信息
+     * 分页查询指定试卷的题目及答案
      */
-    List<Map<String, Object>> getQuestionsWithAnswersByPaperId(Long paperId);
+    Page<Map<String, Object>> getQuestionsWithAnswersByPaperIdPaginated(Long paperId, int pageNum, int pageSize);
+    
+    /**
+     * 根据试卷ID获取题目总数
+     */
+    int getQuestionCountByPaperId(Long paperId);
+    
+    /**
+     * 创建题目
+     */
+    Question createQuestion(Question question);
+    
+    /**
+     * 更新题目
+     */
+    Question updateQuestion(Question question);
+    
+    /**
+     * 删除题目
+     */
+    void deleteQuestion(Long questionId);
+    
+    /**
+     * 创建答案/选项
+     */
+    Answer createAnswer(Answer answer);
+    
+    /**
+     * 更新答案/选项
+     */
+    Answer updateAnswer(Answer answer);
+    
+    /**
+     * 删除答案/选项
+     */
+    void deleteAnswer(Long answerId);
 }

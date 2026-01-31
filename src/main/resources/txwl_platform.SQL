@@ -42,7 +42,7 @@ CREATE TABLE user (
 CREATE TABLE paper (
                        id              BIGINT AUTO_INCREMENT PRIMARY KEY,
                        paper_name      VARCHAR(100) NOT NULL COMMENT '试卷名称',
-                       paper_type      TINYINT      NOT NULL COMMENT '1普通 2测评 360评估…',
+                       paper_type      TINYINT      NOT NULL COMMENT '1普通 2测评',
                        access_role_ids JSON         NOT NULL COMMENT '允许访问的角色ID数组，例：[1,2]',
                        INDEX idx_type (paper_type)
 ) ENGINE=InnoDB COMMENT='问卷/试卷';
@@ -51,7 +51,7 @@ CREATE TABLE paper (
 CREATE TABLE question (
                           id            BIGINT AUTO_INCREMENT PRIMARY KEY,
                           question_text TEXT NOT NULL COMMENT '题干',
-                          q_type        ENUM('SINGLE','MULTI','BLANK','TEXT','SCORE','FILE') NOT NULL COMMENT '题型',
+                          q_type        ENUM('SINGLE','MULTI','BLANK','SORT','SCORE','FILE') NOT NULL COMMENT '题型',
                           paper_id      BIGINT       NOT NULL COMMENT '关联的试卷ID',
                           INDEX idx_paper_id (paper_id),
                           CONSTRAINT fk_question_paper FOREIGN KEY (paper_id) REFERENCES paper(id) ON DELETE CASCADE
@@ -62,7 +62,7 @@ CREATE TABLE answer (
                         id          BIGINT AUTO_INCREMENT PRIMARY KEY,
                         question_id BIGINT NOT NULL,
                         content     TEXT NOT NULL COMMENT '选项/答案内容',
-                        correctness ENUM('CORRECT','WRONG','OPEN')
+                        correctness ENUM('CORRECT','WRONG','OPEN','SORT')
                             NOT NULL DEFAULT 'WRONG' COMMENT '正确程度',
                         CONSTRAINT fk_ans_qst FOREIGN KEY (question_id)
                             REFERENCES question(id) ON DELETE CASCADE,
@@ -88,7 +88,7 @@ INSERT INTO permission(description) VALUES
 
 -- 角色
 INSERT INTO role(role_name) VALUES
-                                ('超级管理员'),('问卷管理员'),('家长'),('学生');
+('SUPER_ADMIN'),('PAPER_ADMIN'),('MATHER'),('FATHER'),('STUDENT');
 
 -- 超级管理员拥有全部权限
 INSERT INTO role_permission(role_id,permission_id)

@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -22,6 +23,7 @@ import java.util.List;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity(prePostEnabled = true) // 启用方法级安全
 public class SecurityConfig {
 
     @Autowired
@@ -68,14 +70,9 @@ public class SecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(authz -> authz
                 .requestMatchers("/api/auth/login", "/api/auth/register", 
-                               "/api/papers/basic-info", "/api/papers", "/api/papers/**",
-                               "/api/questionnaire/paper/*/questions", 
-                               "/api/questionnaire/paper/*/questions/page", 
+                               "/api/papers/basic-info", "/api/papers",
                                "/api/questionnaire/submit",
-                               "/api/questionnaire/**",
-                               "/api/questions/**",
-                               "/api/users/**",
-                               "/api/roles/**").permitAll()
+                               "/reports/**").permitAll()
                 .anyRequest().authenticated()
             );
 

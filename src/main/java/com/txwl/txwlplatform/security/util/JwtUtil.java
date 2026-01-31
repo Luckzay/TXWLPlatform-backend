@@ -38,6 +38,26 @@ public class JwtUtil {
         return getClaimFromToken(token, Claims::getSubject);
     }
 
+    // 从token中获取用户角色ID
+    public Long getUserRoleIdFromToken(String token) {
+        return getClaimFromToken(token, claims -> {
+            Object roleIdObj = claims.get("roleId");
+            if (roleIdObj instanceof Integer) {
+                return ((Integer) roleIdObj).longValue();
+            } else if (roleIdObj instanceof Long) {
+                return (Long) roleIdObj;
+            } else if (roleIdObj instanceof String) {
+                return Long.parseLong((String) roleIdObj);
+            }
+            return null;
+        });
+    }
+
+    // 从token中获取用户角色
+    public String getUserRoleFromToken(String token) {
+        return getClaimFromToken(token, claims -> (String) claims.get("role"));
+    }
+
     // 从token中获取过期时间
     public Date getExpirationDateFromToken(String token) {
         return getClaimFromToken(token, Claims::getExpiration);
@@ -63,9 +83,10 @@ public class JwtUtil {
     }
 
     // 生成token
-    public String generateToken(UserDetails userDetails) {
+    public String generateToken(String username, Long roleId) {
         Map<String, Object> claims = new HashMap<>();
-        return generateToken(claims, userDetails.getUsername());
+        claims.put("roleId", roleId);
+        return generateToken(claims, username);
     }
 
     // 生成token
@@ -74,7 +95,7 @@ public class JwtUtil {
                 .setClaims(claims)
                 .setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + expiration * 1000))
+                .setExpiration(new Date(System.currentTimeMillis() + expiration * 126))//3个小时
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256) // 使用HS256算法
                 .compact();
     }

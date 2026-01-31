@@ -31,4 +31,9 @@ public class RoleServiceImpl implements IRoleService {
         wrapper.eq("role_name", roleName);
         return roleMapper.selectOne(wrapper);
     }
+
+    @Override
+    public Long getRoleIdByName(String identity) {
+        return roleMapper.selectOne(new QueryWrapper<Role>().eq("role_name", identity)).getId();
+    }
 }

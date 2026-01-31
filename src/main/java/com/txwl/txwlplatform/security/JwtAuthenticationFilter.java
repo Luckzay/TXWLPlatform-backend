@@ -10,13 +10,10 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -31,7 +28,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         String servletPath = request.getServletPath(); // This gets the path after context path
         // Check if the request path starts with our authentication endpoints
-        return servletPath.startsWith("/auth/");
+        return servletPath.startsWith("/api/auth/") || servletPath.startsWith("/auth/");
     }
 
     @Override
@@ -65,8 +62,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
                         userDetails, null, userDetails.getAuthorities());
-                usernamePasswordAuthenticationToken
-                        .setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                
+                // 将用户角色ID作为详细信息添加到Authentication中
+                Long userRoleId = jwtUtil.getUserRoleIdFromToken(jwtToken);
+                if (userRoleId != null) {
+                    usernamePasswordAuthenticationToken
+                            .setDetails(new WebAuthenticationDetailsWithUserRoleId(request, userRoleId));
+                } else {
+                    usernamePasswordAuthenticationToken
+                            .setDetails(new WebAuthenticationDetailsWithUserRoleId(request, null));
+                }
+                
                 // After setting the Authentication in the context, we specify
                 // that the current user is authenticated
                 SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);

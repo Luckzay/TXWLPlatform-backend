@@ -30,5 +30,5 @@ public class Paper {
 
     @TableField("access_role_ids")
     @NotBlank(message = "访问角色ID列表不能为空")
-    private String accessRoleIds; // 存储JSON格式的角色ID数组
+    private String accessRoleIds;
 }

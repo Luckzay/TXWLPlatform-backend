@@ -1,11 +1,13 @@
 package com.txwl.txwlplatform.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.txwl.txwlplatform.model.entity.Question;
 import com.txwl.txwlplatform.model.entity.Answer;
+import com.txwl.txwlplatform.model.entity.Question;
 import com.txwl.txwlplatform.service.IQuestionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -54,6 +56,7 @@ public class QuestionController {
      * 根据试卷ID获取题目
      */
     @GetMapping("/paper/{paperId}")
+    @PreAuthorize("@paperPermissionEvaluator.hasPaperAccess(authentication, #paperId)")
     public ResponseEntity<List<Question>> getQuestionsByPaperId(@PathVariable Long paperId) {
         List<Question> questions = questionService.getQuestionsByPaperId(paperId);
         return ResponseEntity.ok(questions);

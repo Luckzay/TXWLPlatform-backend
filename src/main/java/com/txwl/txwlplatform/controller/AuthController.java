@@ -6,7 +6,9 @@ import com.txwl.txwlplatform.model.dto.UserRegisterDto;
 import com.txwl.txwlplatform.model.entity.User;
 import com.txwl.txwlplatform.mapper.UserMapper;
 import com.txwl.txwlplatform.security.util.JwtUtil;
+import com.txwl.txwlplatform.service.IRoleService;
 import com.txwl.txwlplatform.service.IUserService;
+import com.txwl.txwlplatform.service.impl.RoleServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -29,16 +31,13 @@ public class AuthController {
     private UserDetailsService userDetailsService;
 
     @Autowired
+    private IRoleService roleService;
+
+    @Autowired
     private JwtUtil jwtUtil;
 
     @Autowired
     private IUserService userService;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private UserMapper userMapper;
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody @Valid UserLoginDto loginDto) {
@@ -51,15 +50,14 @@ public class AuthController {
             return ResponseEntity.status(401).body("Invalid credentials");
         }
 
-        // 获取用户详细信息用于生成token
-        final UserDetails userDetails = userDetailsService.loadUserByUsername(loginDto.getIdentifier());
-        final String jwt = jwtUtil.generateToken(userDetails);
-        
-        // 查询完整的用户信息用于返回给前端
+        // 查询完整的用户信息用于生成token和返回给前端
         User user = userService.getUserByIdentifier(loginDto.getIdentifier());
         if (user == null) {
             return ResponseEntity.status(401).body("User not found");
         }
+        
+        // 生成JWT token，包含用户名和角色ID
+        final String jwt = jwtUtil.generateToken(user.getUsername(), user.getRoleId());
         
         // 创建包含用户信息的响应对象
         LoginResponse response = new LoginResponse();
@@ -86,15 +84,7 @@ public class AuthController {
         user.setPhone(registerDto.getPhone());
         user.setPassword(registerDto.getPassword()); // 不在这里加密，让服务层处理
         user.setRealname(registerDto.getRealname());
-        
-        // 根据身份设置角色ID
-        if ("student".equalsIgnoreCase(registerDto.getIdentity())) {
-            user.setRoleId(4L); // 学生角色ID
-        } else if ("parent".equalsIgnoreCase(registerDto.getIdentity())) {
-            user.setRoleId(3L); // 家长角色ID
-        } else {
-            user.setRoleId(3L); // 默认为家长角色
-        }
+        user.setRoleId(roleService.getRoleIdByName(registerDto.getIdentity()));
 
         // 保存到数据库
         userService.createUser(user);
