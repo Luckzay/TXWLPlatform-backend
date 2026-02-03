@@ -1,0 +1,79 @@
+# 阿里云容器镜像服务(ACR)构建配置文件
+# 用于定义自动化构建规则和参数
+
+version: v1
+steps:
+  # 构建阶段
+  - name: build
+    image: registry.cn-hangzhou.aliyuncs.com/aliyun-container-service/buildkit:latest
+    commands:
+      - echo "开始构建TXWL Platform后端应用..."
+      - |
+        docker build \
+          --build-arg BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
+          --build-arg VCS_REF=${VCS_REF} \
+          --build-arg VERSION=${VERSION} \
+          -t ${IMAGE} .
+  
+  # 推送阶段
+  - name: push
+    image: registry.cn-hangzhou.aliyuncs.com/aliyun-container-service/docker:latest
+    commands:
+      - echo "推送镜像到ACR..."
+      - docker push ${IMAGE}
+  
+  # 清理阶段
+  - name: cleanup
+    image: registry.cn-hangzhou.aliyuncs.com/aliyun-container-service/docker:latest
+    commands:
+      - echo "清理构建缓存..."
+      - docker system prune -f
+
+# 构建参数配置
+variables:
+  # 基础镜像标签
+  BASE_IMAGE_TAG: "17-jre-alpine"
+  # 应用版本
+  APP_VERSION: "${VERSION}"
+  # 构建时间
+  BUILD_DATE: "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+  # Git提交哈希
+  GIT_COMMIT: "${VCS_REF}"
+
+# 触发配置
+triggers:
+  # Git推送触发
+  - type: git-push
+    branch: main
+  - type: git-push
+    branch: master
+  - type: git-tag
+    pattern: "v*"
+  
+  # 定时构建
+  - type: schedule
+    cron: "0 2 * * *"  # 每天凌晨2点执行
+
+# 通知配置
+notifications:
+  - type: webhook
+    url: "${WEBHOOK_URL}"
+    events:
+      - build-success
+      - build-failure
+  - type: email
+    recipients:
+      - admin@example.com
+    events:
+      - build-failure
+
+# 安全扫描配置
+security-scan:
+  enabled: true
+  fail-on-high: true
+  ignore-unfixed: false
+
+# 镜像签名配置
+image-signing:
+  enabled: true
+  provider: acr

@@ -1,0 +1,194 @@
+name: Build and Push Docker Images
+
+on:
+  push:
+    branches: [ main, master ]
+    tags: [ 'v*' ]
+  pull_request:
+    branches: [ main, master ]
+
+env:
+  # 阿里云ACR配置
+  ACR_REGISTRY: ${{ secrets.ACR_REGISTRY }}
+  ACR_NAMESPACE: ${{ secrets.ACR_NAMESPACE }}
+  ACR_REPOSITORY: txwl-platform-backend
+  
+  # Docker Hub配置
+  DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+  
+  # 应用配置
+  APP_NAME: txwl-platform-backend
+  BASE_IMAGE: eclipse-temurin:17-jre-alpine
+
+jobs:
+  build-and-test:
+    name: Build and Test
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: 'maven'
+        
+    - name: Cache Maven dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.m2/repository
+        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+        restore-keys: |
+          ${{ runner.os }}-maven-
+        
+    - name: Run tests
+      run: mvn test -B
+      
+    - name: Build application
+      run: mvn clean package -DskipTests -B
+      
+    - name: Upload JAR artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: application-jar
+        path: target/*.jar
+        retention-days: 7
+
+  build-docker-images:
+    name: Build Docker Images
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    
+    strategy:
+      matrix:
+        include:
+          - dockerfile: Dockerfile
+            image_suffix: ''
+            platforms: linux/amd64,linux/arm64
+          - dockerfile: Dockerfile.acr
+            image_suffix: '-acr'
+            platforms: linux/amd64
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: Download JAR artifact
+      uses: actions/download-artifact@v3
+      with:
+        name: application-jar
+        path: target/
+    
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v3
+      
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+      
+    - name: Extract Docker metadata
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: |
+          ${{ env.DOCKERHUB_USERNAME }}/${{ env.APP_NAME }}${{ matrix.image_suffix }}
+          ${{ env.ACR_REGISTRY }}/${{ env.ACR_NAMESPACE }}/${{ env.APP_NAME }}${{ matrix.image_suffix }}
+        tags: |
+          type=ref,event=branch
+          type=ref,event=pr
+          type=semver,pattern={{version}}
+          type=semver,pattern={{major}}.{{minor}}
+          type=sha,prefix=,format=short
+        flavor: |
+          latest=auto
+          prefix=
+        labels: |
+          org.opencontainers.image.title=TXWL Platform Backend
+          org.opencontainers.image.description=Backend microservice for TXWL educational platform
+          org.opencontainers.image.vendor=TXWL Platform Team
+          org.opencontainers.image.licenses=MIT
+          org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+          org.opencontainers.image.revision=${{ github.sha }}
+          org.opencontainers.image.created={{datetime}}
+    
+    - name: Login to Docker Hub
+      if: env.DOCKERHUB_USERNAME != ''
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        
+    - name: Login to Alibaba Cloud Container Registry
+      if: env.ACR_REGISTRY != ''
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ secrets.ACR_REGISTRY }}
+        username: ${{ secrets.ACR_USERNAME }}
+        password: ${{ secrets.ACR_PASSWORD }}
+        
+    - name: Build and push Docker image
+      id: docker_build
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        file: ${{ matrix.dockerfile }}
+        platforms: ${{ matrix.platforms }}
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+        build-args: |
+          BUILD_DATE=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.created'] }}
+          VCS_REF=${{ github.sha }}
+          VERSION=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.version'] || 'latest' }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        provenance: false
+        sbom: false
+        
+    - name: Display image digest
+      run: |
+        echo "Image digest: ${{ steps.docker_build.outputs.digest }}"
+        echo "Pushed tags:"
+        echo "${{ steps.meta.outputs.tags }}" | tr ',' '\n' | sed 's/^/  - /'
+        
+    - name: Scan image for vulnerabilities
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: ${{ env.ACR_REGISTRY }}/${{ env.ACR_NAMESPACE }}/${{ env.APP_NAME }}${{ matrix.image_suffix }}:${{ github.sha }}
+        format: sarif
+        output: trivy-results.sarif
+        severity: 'CRITICAL,HIGH'
+        
+    - name: Upload Trivy scan results to GitHub Security tab
+      uses: github/codeql-action/upload-sarif@v2
+      if: always()
+      with:
+        sarif_file: trivy-results.sarif
+        
+  notify-success:
+    name: Notify Success
+    needs: [build-and-test, build-docker-images]
+    runs-on: ubuntu-latest
+    if: success() && github.event_name != 'pull_request'
+    
+    steps:
+    - name: Send success notification
+      uses: appleboy/discord-action@v1.0.0
+      if: vars.DISCORD_WEBHOOK != ''
+      with:
+        webhook_id: ${{ secrets.DISCORD_WEBHOOK_ID }}
+        webhook_token: ${{ secrets.DISCORD_WEBHOOK_TOKEN }}
+        message: |
+          🎉 **TXWL Platform Backend Build Success!**
+          Repository: `${{ github.repository }}`
+          Commit: `${{ github.sha }}`
+          Branch: `${{ github.ref_name }}`
+          Images pushed to ACR and Docker Hub
+          View details: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}

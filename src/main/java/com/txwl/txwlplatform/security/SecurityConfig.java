@@ -71,7 +71,6 @@ public class SecurityConfig {
             .authorizeHttpRequests(authz -> authz
                 .requestMatchers("/api/auth/login", "/api/auth/register", 
                                "/api/papers/basic-info", "/api/papers",
-                               "/api/questionnaire/submit",
                                "/reports/**").permitAll()
                 .anyRequest().authenticated()
             );

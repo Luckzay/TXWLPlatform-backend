@@ -1,0 +1,111 @@
+# 阿里云ACR优化版Dockerfile
+# 专为阿里云容器镜像服务优化的多阶段构建
+
+# 构建参数
+ARG BUILD_DATE
+ARG VCS_REF
+ARG VERSION=0.0.1-SNAPSHOT
+
+# 第一阶段：构建阶段
+FROM registry.cn-hangzhou.aliyuncs.com/aliyun-container-service/maven:3.9.6-eclipse-temurin-17 AS builder
+
+# 设置标签和元数据
+LABEL maintainer="TXWL Platform Team" \
+      description="TXWL Platform Backend Application for ACR" \
+      org.label-schema.build-date=$BUILD_DATE \
+      org.label-schema.vcs-ref=$VCS_REF \
+      org.label-schema.version=$VERSION \
+      org.opencontainers.image.created=$BUILD_DATE \
+      org.opencontainers.image.revision=$VCS_REF \
+      org.opencontainers.image.version=$VERSION
+
+# 设置构建环境
+WORKDIR /build
+
+# 复制Maven配置（利用层缓存）
+COPY pom.xml .
+
+# 预下载依赖（加速后续构建）
+RUN mvn dependency:go-offline -B
+
+# 复制源码并构建
+COPY src ./src
+RUN mvn clean package -DskipTests -B
+
+# 第二阶段：运行阶段
+FROM registry.cn-hangzhou.aliyuncs.com/aliyun-container-service/eclipse-temurin:17-jre-alpine
+
+# 继承构建阶段的标签
+LABEL maintainer="TXWL Platform Team" \
+      description="TXWL Platform Backend Application" \
+      org.label-schema.build-date=$BUILD_DATE \
+      org.label-schema.vcs-ref=$VCS_REF \
+      org.label-schema.version=$VERSION \
+      org.opencontainers.image.created=$BUILD_DATE \
+      org.opencontainers.image.revision=$VCS_REF \
+      org.opencontainers.image.version=$VERSION \
+      org.opencontainers.image.source="https://github.com/your-org/TXWLPlatform-backend" \
+      org.opencontainers.image.title="TXWL Platform Backend" \
+      org.opencontainers.image.description="Backend microservice for TXWL educational platform" \
+      org.opencontainers.image.licenses="MIT"
+
+# 安装运行时依赖
+RUN apk add --no-cache \
+    curl \
+    bash \
+    tzdata \
+    ca-certificates && \
+    # 更新CA证书
+    update-ca-certificates && \
+    # 清理包管理器缓存
+    rm -rf /var/cache/apk/*
+
+# 设置时区
+ENV TZ=Asia/Shanghai
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
+# 创建应用用户
+RUN addgroup -g 1001 -S appuser && \
+    adduser -u 1001 -S appuser -G appuser
+
+# 设置工作目录
+WORKDIR /app
+
+# 从构建阶段复制应用
+COPY --from=builder /build/target/TXWLPlatform-backend-0.0.1-SNAPSHOT.jar app.jar
+
+# 创建必要的目录
+RUN mkdir -p /app/logs /app/config && \
+    chown -R appuser:appuser /app
+
+# 切换到非root用户
+USER appuser
+
+# 暴露端口
+EXPOSE 8080
+
+# 健康检查配置
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD curl -f http://localhost:8080/actuator/health || exit 1
+
+# JVM优化参数
+ENV JAVA_OPTS="-Xms512m -Xmx1024m \
+              -XX:+UseG1GC \
+              -XX:MaxGCPauseMillis=200 \
+              -XX:+HeapDumpOnOutOfMemoryError \
+              -XX:HeapDumpPath=/app/logs/heapdump.hprof \
+              -XX:+UnlockExperimentalVMOptions \
+              -XX:+UseContainerSupport \
+              -XX:MaxRAMPercentage=75.0 \
+              -Djava.security.egd=file:/dev/./urandom \
+              -Dfile.encoding=UTF-8 \
+              -Duser.timezone=Asia/Shanghai"
+
+# Spring Boot配置
+ENV SPRING_PROFILES_ACTIVE=docker,production
+ENV LOGGING_FILE_NAME=/app/logs/application.log
+ENV LOGGING_LEVEL_ROOT=INFO
+ENV SERVER_PORT=8080
+
+# 启动命令
+ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar /app/app.jar"]
